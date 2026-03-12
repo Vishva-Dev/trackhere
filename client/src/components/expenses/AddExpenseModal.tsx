@@ -41,9 +41,11 @@ export default function AddExpenseModal({
 
         let newErrors: any = {}
 
-        if (!title.trim()) newErrors.title = "Title is required"
+        if (!title.trim())
+            newErrors.title = "Title is required"
 
-        if (!category) newErrors.category = "Category required"
+        if (!category)
+            newErrors.category = "Category required"
 
         if (category === "Other" && !subcategory)
             newErrors.subcategory = "Custom category required"
@@ -51,7 +53,8 @@ export default function AddExpenseModal({
         if (!amount || Number(amount) < 0)
             newErrors.amount = "Valid amount required"
 
-        if (!date) newErrors.date = "Date required"
+        if (!date)
+            newErrors.date = "Date required"
 
         setErrors(newErrors)
 
@@ -117,20 +120,27 @@ export default function AddExpenseModal({
                         </div>
 
                         <h2 className="text-xl font-semibold mb-6">
-                            Expense Added Successfully
+
+                            {editing
+                                ? "Expense Modified Successfully"
+                                : "Expense Added Successfully"
+                            }
+
                         </h2>
 
                         <div className="flex justify-center gap-4">
 
-                            <button
-                                onClick={() => {
-                                    setSuccess(false)
-                                    reset()
-                                }}
-                                className="bg-indigo-600 text-white px-5 py-2 rounded-lg"
-                            >
-                                Add Another
-                            </button>
+                            {!editing && (
+                                <button
+                                    onClick={() => {
+                                        setSuccess(false)
+                                        reset()
+                                    }}
+                                    className="bg-indigo-600 text-white px-5 py-2 rounded-lg"
+                                >
+                                    Add Another
+                                </button>
+                            )}
 
                             <button
                                 onClick={close}
@@ -146,6 +156,7 @@ export default function AddExpenseModal({
                 ) : (
 
                     <>
+
                         {/* HEADER */}
 
                         <div className="relative mb-6 text-center">
@@ -236,7 +247,7 @@ export default function AddExpenseModal({
                                     className="border rounded-lg p-2 w-full"
                                 >
 
-                                    <option value="">Select SubCategory</option>
+                                    <option value="">Select Sub-category</option>
 
                                     {EXPENSE_CATEGORIES[
                                         category as keyof typeof EXPENSE_CATEGORIES
@@ -332,6 +343,7 @@ export default function AddExpenseModal({
                             </button>
 
                         </div>
+
                     </>
                 )}
 
