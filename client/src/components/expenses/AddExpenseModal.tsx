@@ -235,7 +235,7 @@ export default function AddExpenseModal({
 
                                 {category === "Other"
                                     ? <>Custom Category <span className="text-red-500">*</span></>
-                                    : "Sub-category"}
+                                    : "Subcategory"}
 
                             </label>
 
@@ -247,7 +247,7 @@ export default function AddExpenseModal({
                                     className="border rounded-lg p-2 w-full"
                                 >
 
-                                    <option value="">Select Sub-category</option>
+                                    <option value="">Select Subcategory</option>
 
                                     {EXPENSE_CATEGORIES[
                                         category as keyof typeof EXPENSE_CATEGORIES
