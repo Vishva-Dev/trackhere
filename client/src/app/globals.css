@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc; /* Soft off-white */
+  --foreground: #1e293b;
+  --primary: #6366f1;   /* Indigo Primary */
+  --accent: #eff6ff;    /* Very light blue */
+  --card-bg: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: #f1f5f9;
+  background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+  /* Actually, the user wants uniform light colors from the image. Let's fix body to be uniform. */
+  background: #f4f7fe; 
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.white-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.bg-primary {
+  background-color: var(--primary);
 }

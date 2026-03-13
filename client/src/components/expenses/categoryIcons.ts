@@ -8,7 +8,7 @@ export const categoryIcons: any = {
     "Clothing & Personal Care": "👕",
     "Entertainment & Leisure": "🎬",
     "Technology & Communication": "💻",
-    "Taxes & Financial Services": "📑",
+    "Financial Services": "💼",
     "Miscellaneous": "📦",
     "Other": "✨"
 

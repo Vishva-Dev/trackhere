@@ -1,13 +1,23 @@
-const prisma = require('../config/db');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import prisma from '../config/db.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Invalid email format' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
         }
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -26,7 +36,7 @@ const register = async (req, res) => {
             },
         });
 
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', {
             expiresIn: '24h',
         });
 
@@ -36,12 +46,12 @@ const register = async (req, res) => {
             user: { id: user.id, name: user.name, email: user.email },
         });
     } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Registration error details:', error);
+        res.status(500).json({ error: 'Registration failed. Please try again.' });
     }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -51,15 +61,15 @@ const login = async (req, res) => {
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', {
             expiresIn: '24h',
         });
 
@@ -70,11 +80,6 @@ const login = async (req, res) => {
         });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Login failed. Please try again.' });
     }
-};
-
-module.exports = {
-    register,
-    login,
 };

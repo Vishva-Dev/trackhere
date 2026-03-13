@@ -63,7 +63,7 @@ export const EXPENSE_CATEGORIES = {
         "Internet"
     ],
 
-    "Taxes & Financial Services": [
+    "Financial Services": [
         "Income Tax",
         "Property Tax",
         "Insurance",
@@ -76,6 +76,7 @@ export const EXPENSE_CATEGORIES = {
         "Gifts",
         "Donations"
     ],
+
 
 
 }
