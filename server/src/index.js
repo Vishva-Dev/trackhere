@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import expenseRoutes from "./routes/expenseRoutes.js";
+import routes from "./routes/index.js";
 
 dotenv.config();
 
@@ -21,8 +21,8 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Expense Routes
-app.use("/expenses", expenseRoutes);
+// Routes
+app.use("/api", routes); // Use a standard /api prefix for all routes
 
 // Start Server
 app.listen(port, () => {

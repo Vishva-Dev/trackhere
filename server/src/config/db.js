@@ -1,24 +1,19 @@
-const { PrismaClient } = require('@prisma/client');
-const { Pool } = require('pg');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const dotenv = require('dotenv');
+import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
 
 dotenv.config();
-
-const connectionString = process.env.DATABASE_URL;
-
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
 
 let prisma;
 
 if (process.env.NODE_ENV === 'production') {
-    prisma = new PrismaClient({ adapter });
+    prisma = new PrismaClient();
 } else {
+    // In development, use a global variable so that the value
+    // is preserved across module reloads caused by HMR.
     if (!global.prisma) {
-        global.prisma = new PrismaClient({ adapter });
+        global.prisma = new PrismaClient();
     }
     prisma = global.prisma;
 }
 
-module.exports = prisma;
+export default prisma;

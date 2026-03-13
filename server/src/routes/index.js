@@ -1,12 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const authRoutes = require('./auth');
-const assetRoutes = require('./assets');
-const portfolioRoutes = require('./portfolio');
+import authRoutes from './auth.js';
+import expenseRoutes from './expenseRoutes.js';
 
 router.use('/auth', authRoutes);
-router.use('/assets', assetRoutes);
-router.use('/portfolio', portfolioRoutes);
+router.use('/expenses', expenseRoutes);
 
-module.exports = router;
+export default router;

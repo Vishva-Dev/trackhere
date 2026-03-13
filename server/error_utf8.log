@@ -1,0 +1,115 @@
+﻿[dotenv@17.3.1] injecting env (0) from .env -- tip: ΓÜÖ∩╕Å  load multiple .env files with { path: ['.env.local', '.env'] }
+node : C:\Users\vishv\D
+esktop\TrackHere\server
+\node_modules\@prisma\c
+lient\runtime\library.j
+s:125
+At line:1 char:1
++ node src/index.js > 
+error.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\vish   
+ v\...\library.js:1    
+25:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+It should have this 
+form: { url: 
+"CONNECTION_STRING" }`)
+}}}},adapter:(e,t)=>{if
+(e===null)return;if(e==
+=void 0)throw new 
+F('"adapter" property 
+must not be undefined, 
+use null to 
+conditionally disable 
+driver adapters.');if(!
+Fn(t).includes("driverA
+dapters"))throw new 
+F('"adapter" property 
+can only be provided 
+to PrismaClient 
+constructor when 
+"driverAdapters" 
+preview feature is enab
+led.');if(Yt()==="binar
+y")throw new F('Cannot 
+use a driver adapter 
+with the "binary" 
+Query Engine. Please 
+use the "library" 
+Query Engine.')},dataso
+urceUrl:e=>{if(typeof 
+e<"u"&&typeof 
+e!="string")throw new 
+F(`Invalid value 
+${JSON.stringify(e)} 
+for "datasourceUrl" 
+provided to 
+PrismaClient 
+constructor.
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+                       
+        ^
+
+PrismaClientConstructor
+ValidationError: 
+"adapter" property can 
+only be provided to 
+PrismaClient 
+constructor when 
+"driverAdapters" 
+preview feature is 
+enabled.
+Read more at https://pr
+is.ly/d/client-construc
+tor
+    at Object.adapter (
+C:\Users\vishv\Desktop\
+TrackHere\server\node_m
+odules\@prisma\client\r
+untime\library.js:125:2
+62)
+    at Gl (C:\Users\vis
+hv\Desktop\TrackHere\se
+rver\node_modules\@pris
+ma\client\runtime\libra
+ry.js:126:2527)
+    at new t (C:\Users\
+vishv\Desktop\TrackHere
+\server\node_modules\@p
+risma\client\runtime\li
+brary.js:130:748)
+    at file:///C:/Users
+/vishv/Desktop/TrackHer
+e/server/src/config/db.
+js:20:25
+    at ModuleJob.run (n
+ode:internal/modules/es
+m/module_job:329:25)
+    at async onImport.t
+racePromise.__proto__ (
+node:internal/modules/e
+sm/loader:644:26)
+    at async asyncRunEn
+tryPointWithESMLoader (
+node:internal/modules/r
+un_main:117:5)
+
+Node.js v22.17.1
+

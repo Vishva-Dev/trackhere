@@ -1,152 +1,205 @@
 import express from "express"
-import prisma from "../lib/prisma.js"
+import prisma from "../config/db.js"
+import authMiddleware from "../middleware/authMiddleware.js"
 
 const router = express.Router()
 
-/* ---------------------------
-   ADD EXPENSE
----------------------------- */
+// Apply authMiddleware to all routes
+router.use(authMiddleware)
 
-router.post("/add", async (req, res) => {
-
-    try {
-
-        const { title, amount, category, subcategory, custom, date, notes } = req.body
-
-        const expense = await prisma.expense.create({
-            data: {
-                title,
-                amount: parseFloat(amount),
-                category,
-                subcategory,
-                custom,
-                notes,
-                date: new Date(date)
-            }
-        })
-
-        res.json(expense)
-
-    } catch (error) {
-
-        console.error(error)
-        res.status(500).json({ error: "Failed to add expense" })
-
-    }
-
-})
-
-
-/* ---------------------------
-   GET EXPENSES
----------------------------- */
-
+// GET all expenses for the authenticated user
 router.get("/", async (req, res) => {
-
     try {
+        const { period, category, year, date } = req.query
+        const userId = req.userId
 
-        const { month, category } = req.query
+        let where = { userId }
 
-        let where = {}
-
-        if (category) {
+        // 1. CATEGORY FILTER
+        if (category && category !== "" && category !== "All Categories") {
             where.category = category
         }
 
-        if (month) {
+        // 2. DATE RANGE CALCULATION
+        const now = new Date()
+        let startDate, endDate
 
-            const start = new Date(month + "-01")
-            const end = new Date(start)
-            end.setMonth(end.getMonth() + 1)
-
-            where.date = {
-                gte: start,
-                lt: end
+        if (date) {
+            const [y, m, d] = date.split("-").map(Number)
+            startDate = new Date(y, m - 1, d, 0, 0, 0, 0)
+            endDate = new Date(y, m - 1, d, 23, 59, 59, 999)
+        } else if (period) {
+            if (period === "today") {
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0)
+                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+            } else if (period === "week") {
+                const day = now.getDay()
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day, 0, 0, 0, 0)
+                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (6 - day), 23, 59, 59, 999)
+            } else if (period === "month") {
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+            } else if (period === "year") {
+                const y = year ? parseInt(year) : now.getFullYear()
+                startDate = new Date(y, 0, 1, 0, 0, 0, 0)
+                endDate = new Date(y, 11, 31, 23, 59, 59, 999)
+            } else if (!isNaN(Number(period)) && Number(period) >= 1 && Number(period) <= 12) {
+                const m = parseInt(period) - 1
+                const y = year ? parseInt(year) : now.getFullYear()
+                startDate = new Date(y, m, 1, 0, 0, 0, 0)
+                endDate = new Date(y, m + 1, 0, 23, 59, 59, 999)
             }
+        } else if (year) {
+            const y = parseInt(year)
+            startDate = new Date(y, 0, 1, 0, 0, 0, 0)
+            endDate = new Date(y, 11, 31, 23, 59, 59, 999)
+        }
 
+        if (startDate && endDate) {
+            where.date = {
+                gte: startDate,
+                lte: endDate
+            }
         }
 
         const expenses = await prisma.expense.findMany({
             where,
-            orderBy: { date: "desc" }
+            orderBy: {
+                date: "desc"
+            }
         })
 
         res.json(expenses)
-
     } catch (error) {
-
-        console.error(error)
+        console.error("Error fetching expenses:", error)
         res.status(500).json({ error: "Failed to fetch expenses" })
-
     }
-
 })
 
-
-/* ---------------------------
-   DELETE EXPENSE
----------------------------- */
-
-router.delete("/:id", async (req, res) => {
-
+// GET single expense by ID (verified ownership)
+router.get("/:id", async (req, res) => {
     try {
+        const { id } = req.params
+        const userId = req.userId
 
-        const id = parseInt(req.params.id)
-
-        await prisma.expense.delete({
-            where: { id }
+        const expense = await prisma.expense.findFirst({
+            where: { 
+                id: parseInt(id),
+                userId: userId
+            }
         })
 
-        res.json({ message: "Expense deleted successfully" })
+        if (!expense) {
+            return res.status(404).json({ error: "Expense not found or unauthorized" })
+        }
 
+        res.json(expense)
     } catch (error) {
-
-        console.error(error)
-        res.status(500).json({ error: "Failed to delete expense" })
-
+        console.error("Error fetching expense:", error)
+        res.status(500).json({ error: "Failed to fetch expense" })
     }
-
 })
 
-
-/* ---------------------------
-   UPDATE EXPENSE
----------------------------- */
-
-router.put("/:id", async (req, res) => {
-
+// POST create new expense
+router.post("/", async (req, res) => {
     try {
+        const { title, amount, category, subcategory, notes, date } = req.body
+        const userId = req.userId
 
-        const id = parseInt(req.params.id)
+        console.log('--- Create Expense Debug ---');
+        console.log('Payload:', { title, amount, category, userId });
 
-        const { title, amount, category, subcategory, custom, date, notes } = req.body
+        if (!amount || !category || !title) {
+            console.warn('Create Expense: Missing required fields');
+            return res.status(400).json({
+                error: "Missing required fields: amount, category, title"
+            })
+        }
 
-        const expense = await prisma.expense.update({
-
-            where: { id },
-
+        const expense = await prisma.expense.create({
             data: {
+                userId,
                 title,
                 amount: parseFloat(amount),
                 category,
-                subcategory,
-                custom,
-                notes,
-                date: new Date(date)
+                subcategory: subcategory || null,
+                notes: notes || null,
+                date: date ? (() => { const [y, m, d] = date.split('-').map(Number); return new Date(y, m - 1, d, 12, 0, 0); })() : new Date()
             }
-
         })
 
-        res.json(expense)
-
+        console.log('Create Expense: Success', expense.id);
+        res.status(201).json(expense)
     } catch (error) {
-
-        console.error(error)
-        res.status(500).json({ error: "Failed to update expense" })
-
+        console.error("Error creating expense:", error.message);
+        res.status(500).json({ error: "Failed to create expense" })
     }
-
 })
 
+// PUT update expense (verified ownership)
+router.put("/:id", async (req, res) => {
+    try {
+        const { id } = req.params
+        const { title, amount, category, subcategory, notes, date } = req.body
+        const userId = req.userId
+
+        // Check if expense exists and belongs to user
+        const existingExpense = await prisma.expense.findFirst({
+            where: { 
+                id: parseInt(id),
+                userId: userId
+            }
+        })
+
+        if (!existingExpense) {
+            return res.status(404).json({ error: "Expense not found or unauthorized" })
+        }
+
+        const updatedExpense = await prisma.expense.update({
+            where: { id: parseInt(id) },
+            data: {
+                title: title || undefined,
+                amount: amount ? parseFloat(amount) : undefined,
+                category: category || undefined,
+                subcategory: subcategory !== undefined ? (subcategory || null) : undefined,
+                notes: notes !== undefined ? (notes || null) : undefined,
+                date: date ? (() => { const [y, m, d] = date.split('-').map(Number); return new Date(y, m - 1, d, 12, 0, 0); })() : undefined
+            }
+        })
+
+        res.json(updatedExpense)
+    } catch (error) {
+        console.error("Error updating expense:", error)
+        res.status(500).json({ error: "Failed to update expense" })
+    }
+})
+
+// DELETE expense (verified ownership)
+router.delete("/:id", async (req, res) => {
+    try {
+        const { id } = req.params
+        const userId = req.userId
+
+        const existingExpense = await prisma.expense.findFirst({
+            where: { 
+                id: parseInt(id),
+                userId: userId
+            }
+        })
+
+        if (!existingExpense) {
+            return res.status(404).json({ error: "Expense not found or unauthorized" })
+        }
+
+        await prisma.expense.delete({
+            where: { id: parseInt(id) }
+        })
+
+        res.status(204).send()
+    } catch (error) {
+        console.error("Error deleting expense:", error)
+        res.status(500).json({ error: "Failed to delete expense" })
+    }
+})
 
 export default router

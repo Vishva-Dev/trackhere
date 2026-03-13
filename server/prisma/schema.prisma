@@ -19,6 +19,7 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   assets    Asset[]
+  expenses  Expense[]
 
   @@map("users")
 }
@@ -39,20 +40,17 @@ model Asset {
 }
 
 model Expense {
-
   id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title        String
   amount       Float
-
   category     String
   subcategory  String?
-
   custom       String?
-
   notes        String?
-
   date         DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  createdAt    DateTime @default(now())
-
+  @@map("expenses")
 }
