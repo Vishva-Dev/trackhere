@@ -16,8 +16,8 @@ model User {
   name      String?
   email     String   @unique
   password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   assets    Asset[]
   expenses  Expense[]
 
@@ -26,22 +26,22 @@ model User {
 
 model Asset {
   id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
+  userId       Int
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assetType    String   @map("asset_type") // e.g., 'crypto', 'stock'
-  assetName    String   @map("asset_name")
+  assetType    String   // e.g., 'crypto', 'stock'
+  assetName    String
   quantity     Float
-  buyPrice     Float    @map("buy_price")
-  currentPrice Float    @map("current_price")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  buyPrice     Float
+  currentPrice Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("assets")
 }
 
 model Expense {
   id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
+  userId       Int
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title        String
   amount       Float
@@ -50,7 +50,7 @@ model Expense {
   custom       String?
   notes        String?
   date         DateTime
-  createdAt    DateTime @default(now()) @map("created_at")
+  createdAt    DateTime @default(now())
 
   @@map("expenses")
 }
