@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,7 +6,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id        Int      @id @default(autoincrement())
@@ -28,7 +24,7 @@ model Asset {
   id           Int      @id @default(autoincrement())
   userId       Int
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assetType    String   // e.g., 'crypto', 'stock'
+  assetType    String
   assetName    String
   quantity     Float
   buyPrice     Float
@@ -40,17 +36,17 @@ model Asset {
 }
 
 model Expense {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title        String
-  amount       Float
-  category     String
-  subcategory  String?
-  custom       String?
-  notes        String?
-  date         DateTime
-  createdAt    DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  amount      Float
+  category    String
+  subcategory String?
+  custom      String?
+  notes       String?
+  date        DateTime
+  createdAt   DateTime @default(now())
 
   @@map("expenses")
 }
