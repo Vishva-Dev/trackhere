@@ -71,8 +71,8 @@ router.get("/", async (req, res) => {
 
         res.json(expenses)
     } catch (error) {
-        console.error("Error fetching expenses:", error)
-        res.status(500).json({ error: "Failed to fetch expenses" })
+        console.error("Error fetching expenses:", error);
+        res.status(500).json({ error: error.message || "Failed to fetch expenses" });
     }
 })
 
@@ -95,8 +95,8 @@ router.get("/:id", async (req, res) => {
 
         res.json(expense)
     } catch (error) {
-        console.error("Error fetching expense:", error)
-        res.status(500).json({ error: "Failed to fetch expense" })
+        console.error("Error fetching expense:", error);
+        res.status(500).json({ error: error.message || "Failed to fetch expense" });
     }
 })
 
@@ -132,7 +132,7 @@ router.post("/", async (req, res) => {
         res.status(201).json(expense)
     } catch (error) {
         console.error("Error creating expense:", error.message);
-        res.status(500).json({ error: "Failed to create expense" })
+        res.status(500).json({ error: error.message || "Failed to create expense" });
     }
 })
 
@@ -169,8 +169,8 @@ router.put("/:id", async (req, res) => {
 
         res.json(updatedExpense)
     } catch (error) {
-        console.error("Error updating expense:", error)
-        res.status(500).json({ error: "Failed to update expense" })
+        console.error("Error updating expense:", error);
+        res.status(500).json({ error: error.message || "Failed to update expense" });
     }
 })
 
@@ -197,8 +197,8 @@ router.delete("/:id", async (req, res) => {
 
         res.status(204).send()
     } catch (error) {
-        console.error("Error deleting expense:", error)
-        res.status(500).json({ error: "Failed to delete expense" })
+        console.error("Error deleting expense:", error);
+        res.status(500).json({ error: error.message || "Failed to delete expense" });
     }
 })
 
