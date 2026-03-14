@@ -22,8 +22,13 @@ export default function Register() {
 
         try {
             const response = await api.post('/auth/register', { name, email, password });
-            login(response.data.user, response.data.token);
-            router.push('/expenses');
+            
+            if (response.data?.user && response.data?.token) {
+                login(response.data.user, response.data.token);
+                router.push('/expenses');
+            } else {
+                setError('Unexpected response from server');
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Failed to register');
         } finally {

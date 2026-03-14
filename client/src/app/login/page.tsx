@@ -21,8 +21,13 @@ export default function Login() {
 
         try {
             const response = await api.post('/auth/login', { email, password });
-            login(response.data.user, response.data.token);
-            router.push('/expenses');
+            
+            if (response.data?.user && response.data?.token) {
+                login(response.data.user, response.data.token);
+                router.push('/expenses');
+            } else {
+                setError('Unexpected response from server');
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Failed to login');
         } finally {

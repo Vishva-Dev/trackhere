@@ -10,10 +10,10 @@ if (process.env.NODE_ENV === 'production') {
 } else {
     // In development, use a global variable so that the value
     // is preserved across module reloads caused by HMR.
-    if (!global.prisma) {
-        global.prisma = new PrismaClient();
+    if (!globalThis.prisma) {
+        globalThis.prisma = new PrismaClient();
     }
-    prisma = global.prisma;
+    prisma = globalThis.prisma;
 }
 
 export default prisma;
